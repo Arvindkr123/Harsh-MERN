@@ -33,3 +33,16 @@ export const userRegisterController = async (req, res, next) => {
     });
   }
 };
+
+export const getUserController = async (req, res, next) => {
+  try {
+    const usersData = await UserModel.find({});
+    res.status(200).json(usersData);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

@@ -6,12 +6,15 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ContextProvider } from "./context/index.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
-      <ToastContainer />
+      <ContextProvider>
+        <App />
+        <ToastContainer />
+      </ContextProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

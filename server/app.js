@@ -10,7 +10,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 app.use("/api/users", userRoutes);
-
+app.use("/uploads", express.static("./uploads"));
 connectDB()
   .then(() => {
     app.listen(PORT, () => {

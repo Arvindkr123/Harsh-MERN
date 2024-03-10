@@ -8,8 +8,12 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Spiner from "../../components/spinner";
 import { registerFunction } from "../../services/Api";
+import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../../context";
 
 const Register = () => {
+  const navigate = useNavigate();
+  const userCtx = useUserContext();
   const [inputData, setInputData] = useState({
     fname: "",
     lname: "",
@@ -37,8 +41,8 @@ const Register = () => {
   }, [image]);
 
   const options = [
-    { value: "active", label: "Active" },
-    { value: "inactive", label: "InActive" },
+    { value: "Active", label: "Active" },
+    { value: "InActive", label: "InActive" },
   ];
 
   const onChnageHanlder = (e) => {
@@ -95,6 +99,24 @@ const Register = () => {
 
       const response = await registerFunction(data, config);
       console.log(response);
+      if (response.status === 201) {
+        setInputData({
+          fname: "",
+          lname: "",
+          email: "",
+          mobile: "",
+          gender: "",
+          location: "",
+        });
+        setStatus("");
+        setImage("");
+        userCtx.setUserAdd(response.data);
+        toast.success("User registered successfully");
+
+        navigate("/");
+      } else {
+        toast.error("Error : Something went wrong");
+      }
     }
   };
 

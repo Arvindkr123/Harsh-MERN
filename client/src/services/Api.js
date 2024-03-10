@@ -12,3 +12,11 @@ export const registerFunction = async (data, header) => {
     console.log(error);
   }
 };
+
+export const getUsersFunction = async () => {
+  try {
+    return await commonRequest("GET", `${BASE_URL}/api/users/details`);
+  } catch (error) {
+    console.log(error);
+  }
+};
