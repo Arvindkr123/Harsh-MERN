@@ -98,7 +98,7 @@ const Register = () => {
       };
 
       const response = await registerFunction(data, config);
-      console.log(response);
+      // console.log(response);
       if (response.status === 201) {
         setInputData({
           fname: "",

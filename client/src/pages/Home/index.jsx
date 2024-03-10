@@ -6,13 +6,18 @@ import { useNavigate } from "react-router-dom";
 import Tables from "../../components/Tables";
 import { useEffect, useState } from "react";
 import Spiner from "../../components/spinner";
-import { useUserContext } from "../../context";
+import {
+  updateUserContext,
+  useUpdateUserContext,
+  useUserContext,
+} from "../../context";
 import Alert from "react-bootstrap/Alert";
 import { getUsersFunction } from "../../services/Api";
 
 const Home = () => {
   const navigate = useNavigate();
   const userCtx = useUserContext();
+  const updateUserCtx = useUpdateUserContext();
   const [userData, setUserData] = useState([]);
   const [showSpin, setShowSpin] = useState(true);
   useEffect(() => {
@@ -49,6 +54,17 @@ const Home = () => {
           dismissible
         >
           {userCtx.userAdd.fname.toUpperCase()} Succesfully Added
+        </Alert>
+      ) : (
+        ""
+      )}
+      {updateUserCtx?.updateUser ? (
+        <Alert
+          variant="success"
+          onClose={() => updateUserCtx.setUpdateUser("")}
+          dismissible
+        >
+          {updateUserCtx?.updateUser?.fname.toUpperCase()} Succesfully Updated
         </Alert>
       ) : (
         ""

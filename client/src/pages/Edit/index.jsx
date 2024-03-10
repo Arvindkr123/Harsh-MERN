@@ -7,8 +7,18 @@ import Button from "react-bootstrap/Button";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Spiner from "../../components/spinner";
+import { useNavigate, useParams } from "react-router-dom";
+import { getSingleUserFunction, userEditFunction } from "../../services/Api";
+import { BASE_URL } from "../../services/helpers";
+import { useUpdateUserContext } from "../../context";
 
 const Edit = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const ctx = useUpdateUserContext();
+  const [user, setUser] = useState();
+  const [showSpin, setShowSpin] = useState(true);
+  const [imgData, setImgData] = useState();
   const [inputData, setInputData] = useState({
     fname: "",
     lname: "",
@@ -17,19 +27,50 @@ const Edit = () => {
     gender: "",
     location: "",
   });
-  const [showSpin, setShowSpin] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let res = await getSingleUserFunction(id);
+        setUser(res.data);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+    fetchData();
+  }, [id]);
+
+  useEffect(() => {
+    if (user) {
+      setInputData({
+        fname: user.fname,
+        lname: user.lname,
+        email: user.email,
+        mobile: user.mobile,
+        gender: user.gender,
+        location: user.location,
+      });
+      setStatus(user.status);
+      setImgData(user.profile);
+    }
+  }, [user]);
+
+  //console.log(user);
+
   useEffect(() => {
     setTimeout(() => {
       setShowSpin(false);
     }, 1200);
   }, []);
 
-  const [status, setStatus] = useState("Active");
+  const [status, setStatus] = useState("");
   const [image, setImage] = useState("");
   const [preview, setPreview] = useState("");
+  //console.log(status);
 
   useEffect(() => {
     if (image) {
+      setImgData("");
       setPreview(URL.createObjectURL(image));
     }
   }, [image]);
@@ -47,7 +88,7 @@ const Edit = () => {
     }
   };
 
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
     const { fname, lname, email, mobile, gender, location } = inputData;
     if (fname === "") {
@@ -62,8 +103,33 @@ const Edit = () => {
       toast.error("please enter a gender");
     } else if (location === "") {
       toast.error("please enter your location");
-    } else if (image === "") {
-      toast.error("please select an image");
+    } else {
+      const data = new FormData();
+      data.append("fname", fname);
+      data.append("lname", lname);
+      data.append("email", email);
+      data.append("mobile", mobile);
+      data.append("location", location);
+      data.append("gender", gender);
+      data.append("status", status);
+      data.append("user_profile", image || imgData);
+      // console.log(status)
+      // console.log(inputData, image);
+
+      const config = {
+        "Content-Type": "multipart/form-data",
+      };
+
+      const res = await userEditFunction(id, data, config);
+      // console.log(res)
+      if (res.status === 200) {
+        ctx.setUpdateUser(res.data);
+        toast.success("updated successfully", inputData.fname);
+        navigate("/");
+      } else {
+        toast.error("error: something went wrong");
+      }
+      //console.log(response);
     }
   };
 
@@ -77,7 +143,7 @@ const Edit = () => {
             <h2 className="text-center mt-1">Update Your Details</h2>
             <div className="profile_div text-center">
               <img
-                src={preview ? preview : "/man.png"}
+                src={image ? preview : `${BASE_URL}/uploads/${imgData}`}
                 className="img-thumbnail"
               />
             </div>
@@ -145,6 +211,7 @@ const Edit = () => {
                     label="Male"
                     name="gender"
                     value="male"
+                    checked={inputData.gender === "male" ? true : false}
                     onChange={(e) => onChnageHanlder(e)}
                   ></Form.Check>
                   <Form.Check
@@ -152,6 +219,7 @@ const Edit = () => {
                     label="Female"
                     name="gender"
                     onChange={(e) => onChnageHanlder(e)}
+                    checked={inputData.gender === "Female" ? true : false}
                     value="female"
                   ></Form.Check>
                 </Form.Group>
@@ -163,7 +231,8 @@ const Edit = () => {
                   <Select
                     options={options}
                     // value={status}
-                    onChange={(e) => setStatus(e.value)}
+                    defaultValue={status}
+                    onChange={(e) => setStatus(e?.value)}
                   />
                 </Form.Group>
                 <Form.Group

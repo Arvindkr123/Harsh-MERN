@@ -46,3 +46,38 @@ export const getUserController = async (req, res, next) => {
     });
   }
 };
+
+export const getSingleUserController = async (req, res, next) => {
+  try {
+    const user = await UserModel.findById(req.params.id);
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const userEditController = async (req, res, next) => {
+  try {
+    const { fname, lname, email, mobile, profile, gender, location, status } =
+      req.body;
+    const file = req.file ? req.file.filename : profile;
+
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      {
+        _id: req.params.id,
+      },
+      { fname, lname, email, mobile, gender, location, status, profile: file },
+      { new: true }
+    );
+    await updatedUser.save();
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

@@ -77,7 +77,7 @@ const Tables = ({ userData }) => {
                             <Dropdown.Menu>
                               <Dropdown.Item>
                                 <NavLink
-                                  to={`/userprofile/${1}`}
+                                  to={`/userprofile/${user._id}`}
                                   className="text-decoration-none"
                                 >
                                   <i
@@ -89,7 +89,7 @@ const Tables = ({ userData }) => {
                               </Dropdown.Item>
                               <Dropdown.Item>
                                 <NavLink
-                                  to={`/edit/id`}
+                                  to={`/edit/${user._id}`}
                                   className="text-decoration-none"
                                 >
                                   <i
