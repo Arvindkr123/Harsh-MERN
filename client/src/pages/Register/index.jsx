@@ -7,6 +7,7 @@ import Button from "react-bootstrap/Button";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Spiner from "../../components/spinner";
+import { registerFunction } from "../../services/Api";
 
 const Register = () => {
   const [inputData, setInputData] = useState({
@@ -41,16 +42,26 @@ const Register = () => {
   ];
 
   const onChnageHanlder = (e) => {
-    if (e.target.name === "gender") {
-      setInputData({ ...inputData, gender: e.target.value });
+    const { name, value } = e.target;
+    // console.log(name, value);
+
+    if (name === "gender") {
+      setInputData((prevData) => ({
+        ...prevData,
+        gender: value,
+      }));
     } else {
-      setInputData({ ...inputData, [e.target.name]: e.target.value });
+      setInputData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
     }
   };
 
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
     const { fname, lname, email, mobile, gender, location } = inputData;
+    // console.log(inputData);
     if (fname === "") {
       toast.error("please enter a first name");
     } else if (lname === "") {
@@ -65,7 +76,30 @@ const Register = () => {
       toast.error("please enter your location");
     } else if (image === "") {
       toast.error("please select an image");
+    } else {
+      const data = new FormData();
+      data.append("fname", fname);
+      data.append("lname", lname);
+      data.append("email", email);
+      data.append("mobile", mobile);
+      data.append("location", location);
+      data.append("gender", gender);
+      data.append("status", status);
+      data.append("user_profile", image);
+      // console.log(status)
+      // console.log(inputData, image);
+
+      const config = {
+        "Content-Type": "multipart/form-data",
+      };
+
+      const response = await registerFunction(data, config);
+      console.log(response);
     }
+  };
+
+  const setStatusValue = (e) => {
+    setStatus(e.value);
   };
 
   return (
@@ -161,11 +195,7 @@ const Register = () => {
                   controlId="exampleForm.ControlInput1"
                 >
                   <Form.Label>Select Your Status</Form.Label>
-                  <Select
-                    options={options}
-                    // value={status}
-                    onChange={(e) => setStatus(e.value)}
-                  />
+                  <Select options={options} onChange={setStatusValue} />
                 </Form.Group>
                 <Form.Group
                   className="mb-3 col-lg-6"
@@ -175,7 +205,6 @@ const Register = () => {
                   <Form.Control
                     type="file"
                     name="user_profile"
-                    // value={image}
                     onChange={(e) => setImage(e.target.files[0])}
                   />
                 </Form.Group>
